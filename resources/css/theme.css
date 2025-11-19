@@ -1,0 +1,9 @@
+/* Placeholder theme.css migrated from legacy assets */
+:root {
+  --brand-color: #0f766e;
+}
+
+body.theme-legacy {
+  background-color: #f8fafc;
+}
+

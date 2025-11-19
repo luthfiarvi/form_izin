@@ -1,0 +1,6 @@
+/* Placeholder print styles for forms */
+@media print {
+  .no-print { display: none !important; }
+  .print-area { padding: 1rem; }
+}
+
