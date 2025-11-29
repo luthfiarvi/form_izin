@@ -27,6 +27,8 @@ class User extends Authenticatable
         'status',
         'whatsapp_phone',
         'role',
+        'points',
+        'discipline_score',
     ];
 
     /**
@@ -49,6 +51,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'points' => 'integer',
+            'discipline_score' => 'integer',
         ];
     }
 
@@ -66,6 +70,35 @@ class User extends Authenticatable
     public function decidedFormIzins()
     {
         return $this->hasMany(\App\Models\FormIzin::class, 'decided_by');
+    }
+
+    /**
+     * Virtual accessor untuk status kedisiplinan (gamification badge).
+     *
+     * @return array{label:string,color:string}
+     */
+    public function getDisciplineStatusAttribute(): array
+    {
+        $score = (int) ($this->discipline_score ?? 100);
+
+        if ($score >= 80) {
+            return [
+                'label' => 'Zona Aman (Role Model)',
+                'color' => 'success',
+            ];
+        }
+
+        if ($score >= 51) {
+            return [
+                'label' => 'Zona Waspada',
+                'color' => 'warning',
+            ];
+        }
+
+        return [
+            'label' => 'Zona Bahaya (SP)',
+            'color' => 'danger',
+        ];
     }
 
     /**

@@ -5,17 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PolicyLog extends Model
+class UserPointQuarter extends Model
 {
     use HasFactory;
 
-    protected $table = 'policy_log';
-
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'year',
+        'quarter',
+        'starting_points',
+        'ending_points',
+        'total_deduction',
+        'closed_at',
+    ];
 
     protected $casts = [
-        'reasons' => 'array',
-        'context' => 'array',
+        'closed_at' => 'datetime',
     ];
 
     public function user()

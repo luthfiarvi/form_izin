@@ -16,7 +16,8 @@ class EnsureUserIsApproved
         }
 
         $status = strtolower((string) ($user->status ?? ''));
-        $isAdmin = (($user->role ?? null) === 'admin') || (bool) ($user->is_kepala_kepegawaian ?? false);
+        $role = $user->role ?? null;
+        $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($user->is_kepala_kepegawaian ?? false);
 
         // Admins/kepala bypass approval; regular users require status=active
         if (!$isAdmin && $status !== 'active') {
@@ -30,4 +31,3 @@ class EnsureUserIsApproved
         return $next($request);
     }
 }
-

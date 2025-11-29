@@ -36,7 +36,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Gates for admin & user management
         Gate::define('admin-only', function (User $user) {
-            return ($user->role ?? null) === 'admin' || (bool) $user->is_kepala_kepegawaian === true;
+            $role = $user->role ?? null;
+            return in_array($role, ['admin', 'hr'], true) || (bool) $user->is_kepala_kepegawaian === true;
         });
 
         Gate::define('manage-users', function (User $user) {

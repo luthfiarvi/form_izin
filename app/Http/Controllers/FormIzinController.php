@@ -60,7 +60,7 @@ class FormIzinController extends Controller
 
         // Notify admins / kepala kepegawaian
         $recipients = \App\Models\User::query()
-            ->where('role', 'admin')
+            ->whereIn('role', ['admin', 'hr'])
             ->orWhere('is_kepala_kepegawaian', true)
             ->get();
         Notification::send($recipients, new IzinSubmitted($form));
@@ -71,7 +71,8 @@ class FormIzinController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $isAdmin = ($user->role ?? null) === 'admin' || (bool) ($user->is_kepala_kepegawaian ?? false);
+        $role = $user->role ?? null;
+        $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($user->is_kepala_kepegawaian ?? false);
 
         $tanggal = (string) $request->string('tanggal'); // legacy single-date param
         $from = (string) $request->string('from');
@@ -133,7 +134,8 @@ class FormIzinController extends Controller
     public function export(Request $request)
     {
         $user = $request->user();
-        $isAdmin = ($user->role ?? null) === 'admin' || (bool) ($user->is_kepala_kepegawaian ?? false);
+        $role = $user->role ?? null;
+        $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($user->is_kepala_kepegawaian ?? false);
         abort_unless($isAdmin, 403);
 
         $tanggal = (string) $request->string('tanggal'); // legacy

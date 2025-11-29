@@ -73,7 +73,8 @@ class FileServeController extends Controller
     public function serveHeadSignature(Request $request, \App\Models\FormIzin $formIzin): StreamedResponse
     {
         $user = Auth::user();
-        $isAdmin = ($user->role ?? null) === 'admin' || (bool) ($user->is_kepala_kepegawaian ?? false);
+        $role = $user->role ?? null;
+        $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($user->is_kepala_kepegawaian ?? false);
         if (!$isAdmin && $formIzin->user_id !== $user->id) {
             abort(403);
         }

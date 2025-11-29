@@ -64,7 +64,7 @@ class IzinController extends Controller
         try {
             $adminId = Auth::id();
             $this->approval->decide($formIzin, $request->action, (int) $adminId);
-            return back()->with('status', 'Form updated');
+            return redirect()->route('izin.data')->with('status', 'Form updated');
         } catch (ApprovalException $e) {
             return back()->withErrors(['approval' => $e->getMessage()]);
         }
@@ -87,7 +87,7 @@ class IzinController extends Controller
             'meta' => [],
         ]);
 
-        return redirect()->route('admin.izin.index')->with('status', 'Form deleted');
+        return redirect()->route('izin.data')->with('status', 'Form deleted');
     }
 
     public function export(Request $request)

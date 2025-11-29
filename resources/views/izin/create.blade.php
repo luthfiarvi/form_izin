@@ -16,12 +16,22 @@
                     </div>
 
                     @if ($errors->any())
-                        <div class="mb-4 text-red-600">
-                            <ul class="list-disc list-inside">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                            <div class="flex items-start gap-2">
+                                <div class="mt-0.5">
+                                    <svg class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.59C19.02 16.95 18.245 18 17.018 18H2.982C1.755 18 .98 16.95 1.74 14.69l6.517-11.59zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V8a1 1 0 112 0v3a1 1 0 01-1 1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-red-800">Pengajuan belum bisa dikirim</div>
+                                    <ul class="mt-1 list-disc list-inside space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     @endif
 
@@ -69,7 +79,7 @@
                             <x-input-error :messages="$errors->get('attachment')" class="mt-2" />
                         </div>
 
-                        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
+                        <div class="mt-8 grid grid-cols-2 gap-6 items-end">
                             <div class="text-center">
                                 <p class="font-semibold">Kepala Kepegawaian</p>
                                 <div class="h-24 border rounded bg-gray-50 mt-2 flex items-center justify-center text-gray-400">(Tanda Tangan)</div>
@@ -79,8 +89,11 @@
                                 <p class="font-semibold">Yang Bersangkutan</p>
                                 @php $sig = optional(Auth::user())->signature_path; @endphp
                                 @if ($sig)
-                                    @php $sigName = basename($sig); @endphp
-                                    <img src="{{ route('files.signature', ['filename' => $sigName], false) }}" alt="Signature" class="h-24 rounded bg-white mx-auto">
+                                    <div
+                                        class="h-24 rounded bg-white mx-auto bg-no-repeat bg-contain bg-center pointer-events-none select-none"
+                                        style="background-image: url('{{ asset('storage/'.$sig) }}');"
+                                        aria-label="Signature">
+                                    </div>
                                 @else
                                     <div class="h-24 border rounded bg-gray-50 mt-2 flex items-center justify-center text-gray-400">(Tanda Tangan)</div>
                                 @endif

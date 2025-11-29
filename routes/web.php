@@ -1,7 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FormIzinController;
+use App\Http\Controllers\PointController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\GamificationController as AdminGamificationController;
+use App\Http\Controllers\Admin\PolicyLogController as AdminPolicyLogController;
 use App\Http\Controllers\Admin\IzinController as AdminIzinController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\FileServeController;
@@ -35,6 +38,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/izin', [FormIzinController::class, 'store'])->name('izin.store');
         Route::get('/izin/data', [FormIzinController::class, 'index'])->name('izin.data');
         Route::get('/izin/{formIzin}/view', [FormIzinController::class, 'view'])->name('izin.view');
+
+        // Ringkasan & riwayat poin pelanggaran
+        Route::get('/points', [PointController::class, 'index'])->name('points.index');
     });
     // Admin-only actions for the data page
     Route::middleware('admin')->group(function () {
@@ -68,8 +74,19 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 
     // User management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
     Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/{user}/approve', [AdminUserController::class, 'approve'])->name('users.approve');
+
+    // Gamification settings & reports
+    Route::get('/gamification/settings', [AdminGamificationController::class, 'edit'])->name('gamification.settings');
+    Route::post('/gamification/settings', [AdminGamificationController::class, 'update'])->name('gamification.settings.update');
+    Route::get('/gamification/summary', [AdminGamificationController::class, 'summary'])->name('gamification.summary');
+
+    // Policy log viewer
+    Route::get('/policy-log', [AdminPolicyLogController::class, 'index'])->name('policy-log.index');
 });

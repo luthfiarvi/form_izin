@@ -9,4 +9,4 @@
 <img src="{{ asset('img/logo-ihbs.png') }}"
      alt="IHBS"
      onerror="this.onerror=null;this.src='{{ $fallbackSvg }}';"
-     {{ $attributes->merge(['class' => 'h-10 w-auto']) }}>
+     {{ $attributes->merge(['class' => 'h-12 w-auto']) }}>

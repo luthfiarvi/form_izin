@@ -12,5 +12,8 @@ class PolicyRule extends Model
     protected $table = 'policy_rules';
 
     protected $guarded = [];
-}
 
+    protected $casts = [
+        'config' => 'array',
+    ];
+}

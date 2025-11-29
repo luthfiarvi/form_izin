@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-6 pb-24">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
             @php($note = session('msg') ?? request()->string('msg')->toString())
             @php($pesan = session('pesan') ?? request()->string('pesan')->toString())
             @if($note)
@@ -92,7 +92,7 @@
                                             @csrf
                                             <button type="submit" class="px-2 py-1 rounded bg-green-600 text-white">Approve</button>
                                         </form>
-                                        <form action="{{ route('izin.reject', ['formIzin' => $row], false) }}" method="POST" onsubmit="return confirm('Yakin ingin menolak?')">
+                                        <form action="{{ route('izin.reject', ['formIzin' => $row], false) }}" method="POST" class="confirm-form" data-confirm="Yakin ingin menolak?" onsubmit="return confirmAction(event, this.dataset.confirm);">
                                             @csrf
                                             <button type="submit" class="px-2 py-1 rounded bg-red-600 text-white">Reject</button>
                                         </form>
@@ -116,22 +116,22 @@
                 @endforelse
             </div>
 
-            {{-- Tabel penuh untuk layar >= sm (scroll horizontal jika perlu) --}}
-            <div class="hidden sm:block overflow-x-auto">
-                <table class="min-w-full bg-white shadow-md rounded-xl overflow-hidden">
+            {{-- Tabel penuh untuk layar >= sm (dibuat lebih ramping agar tidak perlu geser) --}}
+            <div class="hidden sm:block">
+                <table class="w-full table-auto bg-white shadow-md rounded-xl overflow-hidden text-xs sm:text-sm">
                     <thead class="bg-green-600 text-white">
                         <tr>
-                            <th class="py-3 px-4 text-left">#</th>
-                            <th class="py-3 px-4 text-left">Tanggal</th>
-                            <th class="py-3 px-4 text-left">Nama</th>
-                            <th class="py-3 px-4 text-left">Masuk Jam</th>
-                            <th class="py-3 px-4 text-left">Keluar Jam</th>
-                            <th class="py-3 px-4 text-left">Jenis Izin</th>
-                            <th class="py-3 px-4 text-left">Lampiran</th>
-                            <th class="py-3 px-4 text-left">Keperluan</th>
-                            <th class="py-3 px-4 text-left">Waktu Input</th>
-                            <th class="py-3 px-4 text-left">Status</th>
-                            <th class="py-3 px-4 text-left">Aksi</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">#</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Tanggal</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Nama</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Masuk</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Keluar</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Jenis</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Lampiran</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Keperluan</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Waktu Input</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Status</th>
+                            <th class="py-2 px-2 sm:px-3 text-left">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -139,13 +139,13 @@
                         @forelse($forms as $row)
                             @php($status = $row->approved_at ? 'approved' : ($row->rejected_at ? 'rejected' : 'pending'))
                             <tr class="border-b hover:bg-gray-50">
-                                <td class="py-2 px-4">{{ $no++ }}</td>
-                                <td class="py-2 px-4">{{ optional($row->date)->format('d/m/Y') ?: (is_string($row->date) ? $row->date : $row->created_at->format('d/m/Y')) }}</td>
-                                <td class="py-2 px-4">{{ optional($row->user)->name }}</td>
-                                <td class="py-2 px-4">{{ $row->in_time ?? '--:--' }}</td>
-                                <td class="py-2 px-4">{{ $row->out_time ?? '--:--' }}</td>
-                                <td class="py-2 px-4 capitalize">{{ $row->izin_type }}</td>
-                                <td class="py-2 px-4">
+                                <td class="py-2 px-2 sm:px-3">{{ $no++ }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">{{ optional($row->date)->format('d/m/Y') ?: (is_string($row->date) ? $row->date : $row->created_at->format('d/m/Y')) }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">{{ optional($row->user)->name }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">{{ $row->in_time ?? '--:--' }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">{{ $row->out_time ?? '--:--' }}</td>
+                                <td class="py-2 px-2 sm:px-3 capitalize whitespace-nowrap">{{ $row->izin_type }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">
                                     @php($att = $row->attachment_path)
                                     @if($att)
                                         <a class="text-blue-600 hover:underline" target="_blank" href="{{ route('files.attachment', ['filename' => basename($att)], false) }}">Lihat</a>
@@ -153,24 +153,24 @@
                                         <span class="text-gray-400 italic">-</span>
                                     @endif
                                 </td>
-                                <td class="py-2 px-4">{{ $row->purpose }}</td>
-                                <td class="py-2 px-4">{{ optional($row->created_at)->format('Y-m-d H:i:s') }}</td>
-                                <td class="py-2 px-4 capitalize">{{ $status }}</td>
-                                <td class="py-2 px-4 whitespace-nowrap">
+                                <td class="py-2 px-2 sm:px-3 whitespace-normal break-words max-w-[12rem]">{{ $row->purpose }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">{{ optional($row->created_at)->format('Y-m-d H:i:s') }}</td>
+                                <td class="py-2 px-2 sm:px-3 capitalize whitespace-nowrap">{{ $status }}</td>
+                                <td class="py-2 px-2 sm:px-3 whitespace-nowrap">
                                     @if(!empty($isAdmin) && $isAdmin)
                                         @if($status==='pending')
                                             <form action="{{ route('izin.approve', ['formIzin' => $row], false) }}" method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit" class="text-green-600 hover:underline mr-2">Approve</button>
                                             </form>
-                                            <form action="{{ route('izin.reject', ['formIzin' => $row], false) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menolak?')">
+                                            <form action="{{ route('izin.reject', ['formIzin' => $row], false) }}" method="POST" class="inline confirm-form" data-confirm="Yakin ingin menolak?" onsubmit="return confirmAction(event, this.dataset.confirm);">
                                                 @csrf
                                                 <button type="submit" class="text-red-600 hover:underline mr-2">Reject</button>
                                             </form>
                                         @else
                                             <a href="{{ route('izin.view', ['formIzin' => $row], false) }}" class="text-blue-600 hover:underline mr-2">Lihat Form</a>
                                         @endif
-                                        <form action="{{ route('izin.delete', ['formIzin' => $row], false) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                        <form action="{{ route('izin.delete', ['formIzin' => $row], false) }}" method="POST" class="inline confirm-form" data-confirm="Yakin ingin menghapus?" onsubmit="return confirmAction(event, this.dataset.confirm);">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:underline ml-1">Hapus</button>
@@ -198,3 +198,86 @@
     </div>
 
 </x-app-layout>
+
+{{-- Modal konfirmasi custom agar lebih enak dilihat --}}
+<div id="confirm-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 px-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-[fadeIn_0.15s_ease-out]">
+        <div class="flex items-start gap-3">
+            <div class="shrink-0 w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v4m0 4h.01M3.84 18h16.32c1.1 0 1.77-1.18 1.23-2.14L13.23 4.86c-.55-.96-1.91-.96-2.46 0L2.61 15.86c-.54.96.14 2.14 1.23 2.14Z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900">Yakin ingin melanjutkan?</h3>
+                <p id="confirm-message" class="mt-1 text-sm text-gray-700 leading-relaxed">Tindakan ini tidak bisa dibatalkan.</p>
+            </div>
+        </div>
+        <div class="mt-5 flex flex-col sm:flex-row sm:justify-end gap-3">
+            <button type="button" id="confirm-cancel" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">Batal</button>
+            <button type="button" id="confirm-yes" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 shadow-sm transition">Ya, tetap lanjut</button>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+(function () {
+    let modal, msgEl, btnYes, btnCancel, pendingForm = null;
+
+    function ensureModal() {
+        if (modal) return true;
+        modal = document.getElementById('confirm-modal');
+        if (!modal) return false;
+        msgEl = document.getElementById('confirm-message');
+        btnYes = document.getElementById('confirm-yes');
+        btnCancel = document.getElementById('confirm-cancel');
+
+        btnYes.addEventListener('click', function () {
+            if (pendingForm) {
+                pendingForm.submit();
+            }
+            closeModal();
+        });
+
+        btnCancel.addEventListener('click', closeModal);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+
+        return true;
+    }
+
+    function openModal(message, form) {
+        if (!ensureModal()) return false;
+        pendingForm = form;
+        msgEl.textContent = message || 'Apakah Anda yakin?';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        return true;
+    }
+
+    function closeModal() {
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        pendingForm = null;
+    }
+
+    // Fungsi global yang dipanggil dari onsubmit di form
+    window.confirmAction = function (event, message) {
+        const form = event.target;
+        event.preventDefault();
+
+        // Coba modal custom; jika gagal, fallback confirm native
+        const opened = openModal(message, form);
+        if (!opened) {
+            if (window.confirm(message || 'Apakah Anda yakin?')) {
+                form.submit();
+            }
+        }
+        return false;
+    };
+})();
+</script>
+@endpush

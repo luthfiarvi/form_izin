@@ -7,6 +7,8 @@ use App\Models\AuditLog;
 use App\Models\FormIzin;
 use App\Models\User;
 use App\Notifications\IzinDecided;
+use App\Services\GamificationConfigService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -58,6 +60,96 @@ class ApprovalService
                 }
             }
             $form->save();
+
+            // Apply gamification logic on approve (points + discipline_score)
+            if ($action === 'approve') {
+                $user = $form->user()->lockForUpdate()->first();
+                if ($user) {
+                    /** @var GamificationConfigService $configService */
+                    $configService = app(GamificationConfigService::class);
+                    $config = $configService->get();
+
+                    $basePenaltyNonSick = (int) ($config['base_penalty_non_sick'] ?? 5);
+                    $toleranceMinutes = (int) ($config['tolerance_minutes'] ?? 60);
+                    $intervalMinutes = max(1, (int) ($config['interval_minutes'] ?? 30));
+                    $penaltyPerInterval = (int) ($config['penalty_per_interval'] ?? 2);
+
+                    // --- Existing violation points logic ---
+                    $pointsDeduction = 0;
+
+                    // Base deduction by izin type (case-insensitive)
+                    $type = strtolower((string) $form->izin_type);
+                    if ($type !== 'sakit') {
+                        // For non-sick leave (e.g. pribadi, dinas luar, dll) deduct 5 points (configurable)
+                        $pointsDeduction += $basePenaltyNonSick;
+                    }
+
+                    // Additional deduction for long duration (> 3 hours)
+                    if (!empty($form->in_time) && !empty($form->out_time)) {
+                        try {
+                            $in = Carbon::createFromFormat('H:i', $form->in_time);
+                            $out = Carbon::createFromFormat('H:i', $form->out_time);
+                            $minutes = $out->diffInMinutes($in);
+                            if ($minutes > 180) {
+                                $pointsDeduction += 10;
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning('Failed to calculate izin duration for points', [
+                                'form_id' => $form->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    if ($pointsDeduction > 0) {
+                        $currentPoints = (int) ($user->points ?? 100);
+                        $user->points = max(0, $currentPoints - $pointsDeduction);
+                    }
+
+                    // --- New discipline_score gamification logic ---
+                    $disciplinePenalty = 0;
+
+                    // 1. Base penalty by izin type
+                    $isSakit = $type === 'sakit';
+                    $isDinasLuar = in_array($type, ['dinas luar', 'dinas_luar'], true);
+                    if (! $isSakit && ! $isDinasLuar) {
+                        // contoh: pribadi / kepentingan pribadi, dll.
+                        $disciplinePenalty += $basePenaltyNonSick;
+                    }
+
+                    // 2. Dynamic time-based penalty
+                    if (!empty($form->in_time) && !empty($form->out_time)) {
+                        try {
+                            $in = Carbon::createFromFormat('H:i', $form->in_time);
+                            $out = Carbon::createFromFormat('H:i', $form->out_time);
+                            $minutes = $out->diffInMinutes($in);
+
+                            if ($minutes > $toleranceMinutes) {
+                                $excess = $minutes - $toleranceMinutes;
+                                $blocks = (int) ceil($excess / $intervalMinutes);
+                                if ($blocks > 0) {
+                                    $disciplinePenalty += $blocks * $penaltyPerInterval;
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning('Failed to calculate duration for discipline_score', [
+                                'form_id' => $form->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    if ($disciplinePenalty > 0) {
+                        $currentScore = (int) ($user->discipline_score ?? 100);
+                        $user->discipline_score = max(0, $currentScore - $disciplinePenalty);
+                    }
+
+                    // Persist user changes if any gamification update occurred
+                    if ($user->isDirty(['points', 'discipline_score'])) {
+                        $user->save();
+                    }
+                }
+            }
 
             $form->load('user');
             if ($form->user) {

@@ -37,7 +37,8 @@ class AuthenticatedSessionController extends Controller
             // Block login for users not yet approved (non-admins)
             $logged = \Illuminate\Support\Facades\Auth::user();
             $status = strtolower((string) ($logged->status ?? ''));
-            $isAdmin = (($logged->role ?? null) === 'admin') || (bool) ($logged->is_kepala_kepegawaian ?? false);
+            $role = $logged->role ?? null;
+            $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($logged->is_kepala_kepegawaian ?? false);
             if (! $isAdmin && $status !== 'active') {
                 \Illuminate\Support\Facades\Auth::logout();
                 // Reset session + CSRF to avoid 419 on next request
@@ -65,7 +66,8 @@ class AuthenticatedSessionController extends Controller
 
                 // Block login for users not yet approved (non-admins)
                 $status = strtolower((string) ($user->status ?? ''));
-                $isAdmin = (($user->role ?? null) === 'admin') || (bool) ($user->is_kepala_kepegawaian ?? false);
+                $role = $user->role ?? null;
+                $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($user->is_kepala_kepegawaian ?? false);
                 if (! $isAdmin && $status !== 'active') {
                     // Reset CSRF/session before redirect to prevent 419
                     $request->session()->invalidate();

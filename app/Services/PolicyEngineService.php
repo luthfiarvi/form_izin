@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\PolicyViolationException;
 use App\Models\User;
 use App\Models\PolicyLog;
+use App\Services\GamificationConfigService;
 use Illuminate\Support\Facades\Log;
 
 class PolicyEngineService
@@ -20,12 +21,40 @@ class PolicyEngineService
         $reasons = [];
 
         // Example basic checks; extend when legacy rules are available.
+        $status = null;
+        $points = null;
+        $disciplineScore = null;
+
+        /** @var GamificationConfigService $configService */
+        $configService = app(GamificationConfigService::class);
+        $cfg = $configService->get();
+        $blockPointsAt = (int) ($cfg['block_points_at_or_below'] ?? 0);
+        $blockDisciplineAt = (int) ($cfg['block_discipline_at_or_below'] ?? 50);
+
         if (method_exists($user, 'getAttribute')) {
             $status = strtolower((string) $user->getAttribute('status'));
-            $isAdmin = (($user->role ?? null) === 'admin') || (bool) ($user->is_kepala_kepegawaian ?? false);
+            $points = $user->getAttribute('points');
+            $disciplineScore = $user->getAttribute('discipline_score');
+
+            $role = $user->role ?? null;
+            $isAdmin = in_array($role, ['admin', 'hr'], true) || (bool) ($user->is_kepala_kepegawaian ?? false);
             // Require explicit approval for non-admins
-            if (!$isAdmin && $status !== 'active') {
+            if (! $isAdmin && $status !== 'active') {
                 $reasons[] = 'Akun belum disetujui admin';
+            }
+
+            if (! $isAdmin) {
+                // Policy: user must still have positive violation points
+                $numericPoints = (int) ($points ?? 100);
+                if ($numericPoints <= $blockPointsAt) {
+                    $reasons[] = 'Sisa poin pelanggaran Anda habis (0). Hubungi BK.';
+                }
+
+                // Game Over rule based on discipline_score
+                $numericDiscipline = (int) ($disciplineScore ?? 100);
+                if ($numericDiscipline <= $blockDisciplineAt) {
+                    $reasons[] = "Skor kedisiplinan Anda Kritis ({$numericDiscipline}/100). Akses izin dibekukan. Harap segera menghadap HRD.";
+                }
             }
         }
 
@@ -45,7 +74,9 @@ class PolicyEngineService
                 'allowed' => $allowed,
                 'reasons' => $reasons,
                 'context' => [
-                    'status' => method_exists($user, 'getAttribute') ? (string) $user->getAttribute('status') : null,
+                    'status' => $status,
+                    'points' => $points,
+                    'discipline_score' => $disciplineScore,
                 ],
                 'evaluated_at' => now(),
             ]);

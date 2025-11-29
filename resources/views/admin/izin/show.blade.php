@@ -71,19 +71,40 @@
                             <input type="hidden" name="action" value="approve">
                             <x-primary-button>Approve</x-primary-button>
                         </form>
-                        <form method="post" action="{{ route('admin.izin.update', ['formIzin' => $form], false) }}">
+                        <form method="post" action="{{ route('admin.izin.update', ['formIzin' => $form], false) }}" class="confirm-form" data-confirm="Tolak pengajuan izin ini?">
                             @csrf
                             @method('patch')
                             <input type="hidden" name="action" value="reject">
-                            <x-secondary-button>Reject</x-secondary-button>
+                            <x-secondary-button type="submit">Reject</x-secondary-button>
                         </form>
-                        <form method="post" action="{{ route('admin.izin.destroy', ['formIzin' => $form], false) }}" onsubmit="return confirm('Hapus form ini?')">
+                        <form method="post" action="{{ route('admin.izin.destroy', ['formIzin' => $form], false) }}" class="confirm-form" data-confirm="Hapus form ini? Data tidak bisa dipulihkan.">
                             @csrf
                             @method('delete')
                             <button class="px-4 py-2 rounded bg-gray-200 text-gray-800">Hapus</button>
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal konfirmasi reuse (ikut global) --}}
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+        <div class="bg-white/90 border border-red-100 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-[fadeIn_0.15s_ease-out]">
+            <div class="flex items-start gap-3">
+                <div class="shrink-0 w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v4m0 4h.01M3.84 18h16.32c1.1 0 1.77-1.18 1.23-2.14L13.23 4.86c-.55-.96-1.91-.96-2.46 0L2.61 15.86c-.54.96.14 2.14 1.23 2.14Z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900">Yakin ingin melanjutkan?</h3>
+                    <p id="confirm-message" class="mt-1 text-sm text-gray-700 leading-relaxed">Tindakan ini tidak bisa dibatalkan.</p>
+                </div>
+            </div>
+            <div class="mt-5 flex flex-col sm:flex-row sm:justify-end gap-3">
+                <button type="button" id="confirm-cancel" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">Batal</button>
+                <button type="button" id="confirm-yes" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 shadow-sm transition">Ya, lanjut</button>
             </div>
         </div>
     </div>

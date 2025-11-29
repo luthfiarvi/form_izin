@@ -19,20 +19,43 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'status' => 'active',
+            'role' => 'user',
+        ]);
 
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
+        $this->assertAuthenticatedAs($user);
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_pending_users_cannot_authenticate_until_approved(): void
+    {
+        $user = User::factory()->create([
+            'status' => 'pending',
+            'role' => 'user',
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('status', 'Login belum bisa: akun Anda belum disetujui admin.');
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'status' => 'active',
+            'role' => 'user',
+        ]);
 
         $this->post('/login', [
             'email' => $user->email,
@@ -44,7 +67,10 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_logout(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'status' => 'active',
+            'role' => 'user',
+        ]);
 
         $response = $this->actingAs($user)->post('/logout');
 

@@ -32,9 +32,80 @@ class UserController extends Controller
         return view('admin.users.index', compact('users', 'search'));
     }
 
+    /**
+     * Redirect show requests to the edit page so /admin/users/{id} does not 404.
+     */
+    public function show(User $user): RedirectResponse
+    {
+        return redirect()->route('admin.users.edit', ['user' => $user]);
+    }
+
     public function edit(User $user): View
     {
         return view('admin.users.edit', compact('user'));
+    }
+
+    public function create(): View
+    {
+        $user = new User();
+        return view('admin.users.create', compact('user'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        Gate::authorize('manage-users');
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'role' => ['required', 'in:user,admin,hr'],
+            'is_kepala_kepegawaian' => ['nullable', 'boolean'],
+            'status' => ['nullable', 'string', 'max:50'],
+            'whatsapp_phone' => ['nullable', 'string', 'max:50'],
+            'points' => ['nullable', 'integer', 'min:0', 'max:1000'],
+            'discipline_score' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'password' => ['required', 'string', 'min:8'],
+            'signature_file' => ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:2048'],
+            'signature' => ['nullable', 'string'],
+            'profile_photo' => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp,avif,heic,heif', 'max:4096'],
+        ]);
+
+        $user = new User();
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->role = $data['role'];
+        $user->is_kepala_kepegawaian = $request->boolean('is_kepala_kepegawaian');
+        $user->status = $data['status'] ?? 'active';
+        $user->whatsapp_phone = $data['whatsapp_phone'] ?? null;
+        $user->points = $data['points'] ?? 100;
+        $user->discipline_score = $data['discipline_score'] ?? 100;
+        $user->password = Hash::make($data['password']);
+
+        // Upload tanda tangan (file atau canvas)
+        if ($request->hasFile('signature_file')) {
+            $user->signature_path = $request->file('signature_file')->store('signatures', 'public');
+        } elseif ($request->filled('signature')) {
+            $dataSig = (string) $request->string('signature');
+            if (str_starts_with($dataSig, 'data:image')) {
+                $commaPos = strpos($dataSig, ',');
+                $payload = substr($dataSig, ($commaPos ?: -1) + 1);
+                $binary = base64_decode($payload, true);
+                if ($binary !== false) {
+                    $filename = 'signatures/'.Str::uuid().'.png';
+                    Storage::disk('public')->put($filename, $binary);
+                    $user->signature_path = $filename;
+                }
+            }
+        }
+
+        // Upload foto profil
+        if ($request->hasFile('profile_photo')) {
+            $user->profile_photo_path = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('status', 'Akun baru berhasil dibuat');
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -44,10 +115,12 @@ class UserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
-            'role' => ['required', 'in:user,admin'],
+            'role' => ['required', 'in:user,admin,hr'],
             'is_kepala_kepegawaian' => ['nullable', 'boolean'],
             'status' => ['nullable', 'string', 'max:50'],
             'whatsapp_phone' => ['nullable', 'string', 'max:50'],
+            'points' => ['nullable', 'integer', 'min:0', 'max:1000'],
+            'discipline_score' => ['nullable', 'integer', 'min:0', 'max:100'],
             'password' => ['nullable', 'string', 'min:8'],
             'signature_file' => ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:2048'],
             'signature' => ['nullable', 'string'],
@@ -61,6 +134,14 @@ class UserController extends Controller
         $user->is_kepala_kepegawaian = $request->boolean('is_kepala_kepegawaian');
         $user->status = $request->string('status')->toString();
         $user->whatsapp_phone = $request->string('whatsapp_phone')->toString();
+
+        if ($request->filled('points')) {
+            $user->points = (int) $request->input('points');
+        }
+
+        if ($request->filled('discipline_score')) {
+            $user->discipline_score = (int) $request->input('discipline_score');
+        }
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->string('password')->toString());
@@ -94,7 +175,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('status', 'User updated');
+        return redirect()->back()->with('status', 'Data pengguna diperbarui');
     }
 
     public function destroy(User $user): RedirectResponse
@@ -107,14 +188,23 @@ class UserController extends Controller
         }
 
         $user->delete();
-        return redirect()->route('admin.users.index')->with('status', 'User deleted');
+        return redirect()->back()->with('status', 'Pengguna berhasil dihapus');
     }
 
     public function approve(User $user): RedirectResponse
     {
         Gate::authorize('manage-users');
-        $user->status = 'active';
-        $user->save();
-        return back()->with('status', 'User approved');
+
+        // Hanya ubah bila masih pending/tidak aktif
+        if (($user->status ?? 'pending') !== 'active') {
+            $user->status = 'active';
+            // Optional: sekaligus verifikasi email bila belum
+            if (empty($user->email_verified_at)) {
+                $user->email_verified_at = now();
+            }
+            $user->save();
+        }
+
+        return redirect()->back()->with('status', 'Pengguna disetujui');
     }
 }
