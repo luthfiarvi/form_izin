@@ -1,9 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-white leading-tight">Manajemen User</h2>
+        <h2 class="font-extrabold text-3xl sm:text-4xl text-white leading-tight tracking-wide">Manajemen User</h2>
     </x-slot>
 
-    <div class="py-6 pb-24">
+    <div class="py-6 pb-24 text-base sm:text-lg leading-relaxed">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             @php($msg = request()->string('msg')->toString())
             @if($msg)
@@ -12,10 +12,10 @@
             @endif
 
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Daftar Pengguna</h3>
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.users.index', [], false) }}" class="bg-[color:var(--brand-green)] text-white px-4 py-2 rounded hover:bg-emerald-900">Kelola Lengkap</a>
-                    <a href="{{ route('admin.users.create', [], false) }}" class="bg-[color:var(--brand-green)] text-white px-4 py-2 rounded hover:bg-emerald-900">Tambah Akun</a>
+                <h3 class="text-2xl sm:text-3xl font-semibold text-gray-900">Daftar Pengguna</h3>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.users.index', [], false) }}" class="bg-[color:var(--brand-green)] text-white px-5 py-2.5 rounded hover:bg-emerald-900 text-base sm:text-lg font-semibold">Kelola Lengkap</a>
+                    <a href="{{ route('admin.users.create', [], false) }}" class="bg-[color:var(--brand-green)] text-white px-5 py-2.5 rounded hover:bg-emerald-900 text-base sm:text-lg font-semibold">Tambah Akun</a>
                 </div>
             </div>
 
@@ -82,7 +82,7 @@
 
             {{-- Tabel penuh untuk layar >= sm --}}
             <div class="hidden sm:block overflow-x-auto">
-                <table class="min-w-full bg-white shadow-md rounded-xl overflow-hidden">
+                <table class="min-w-full bg-white shadow-md rounded-xl overflow-hidden text-base sm:text-lg">
                     <thead class="bg-green-600 text-white">
                         <tr>
                             <th class="py-3 px-4 text-left">#</th>
@@ -105,22 +105,22 @@
                                     @if($st === 'pending')
                                         <form action="{{ route('admin.users.approve', ['user' => $u], false) }}" method="POST" class="inline">
                                             @csrf
-                                            <button type="submit" class="bg-[color:var(--brand-green)] text-white px-3 py-1 rounded hover:bg-emerald-900 text-sm">Accept</button>
+                                            <button type="submit" class="bg-[color:var(--brand-green)] text-white px-4 py-2 rounded hover:bg-emerald-900 text-base">Accept</button>
                                         </form>
                                         <form action="{{ route('admin.users.destroy', ['user' => $u], false) }}" method="POST" class="inline confirm-form" data-confirm="Yakin mau tolak user ini?" onsubmit="return confirmAction(event, this.dataset.confirm);">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Reject</button>
+                                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-base">Reject</button>
                                         </form>
                                     @elseif($u->id !== auth()->id())
-                                        <a href="{{ route('admin.users.edit', ['user' => $u], false) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Edit</a>
+                                        <a href="{{ route('admin.users.edit', ['user' => $u], false) }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-base">Edit</a>
                                         <form action="{{ route('admin.users.destroy', ['user' => $u], false) }}" method="POST" class="inline confirm-form" data-confirm="Hapus akun ini? Data tidak bisa dipulihkan." onsubmit="return confirmAction(event, this.dataset.confirm);">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Hapus</button>
+                                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-base">Hapus</button>
                                         </form>
                                     @else
-                                        <span class="text-gray-400 text-sm">Tidak bisa edit/hapus diri sendiri</span>
+                                        <span class="text-gray-400 text-base">Tidak bisa edit/hapus diri sendiri</span>
                                     @endif
                                 </td>
                             </tr>

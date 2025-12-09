@@ -79,25 +79,28 @@ class ApprovalService
 
                     // Base deduction by izin type (case-insensitive)
                     $type = strtolower((string) $form->izin_type);
-                    if ($type !== 'sakit') {
-                        // For non-sick leave (e.g. pribadi, dinas luar, dll) deduct 5 points (configurable)
-                        $pointsDeduction += $basePenaltyNonSick;
-                    }
+                    $isSakit = $type === 'sakit';
+                    $isDinasLuar = in_array($type, ['dinas luar', 'dinas_luar'], true);
 
-                    // Additional deduction for long duration (> 3 hours)
-                    if (!empty($form->in_time) && !empty($form->out_time)) {
-                        try {
-                            $in = Carbon::createFromFormat('H:i', $form->in_time);
-                            $out = Carbon::createFromFormat('H:i', $form->out_time);
-                            $minutes = $out->diffInMinutes($in);
-                            if ($minutes > 180) {
-                                $pointsDeduction += 10;
+                    if (! $isSakit && ! $isDinasLuar) {
+                        // Non-sick, non-dinas-luar (mis. pribadi) kena base
+                        $pointsDeduction += $basePenaltyNonSick;
+
+                        // Additional deduction for long duration (> 3 hours)
+                        if (!empty($form->in_time) && !empty($form->out_time)) {
+                            try {
+                                $in = Carbon::createFromFormat('H:i', $form->in_time);
+                                $out = Carbon::createFromFormat('H:i', $form->out_time);
+                                $minutes = $out->diffInMinutes($in);
+                                if ($minutes > 180) {
+                                    $pointsDeduction += 10;
+                                }
+                            } catch (\Throwable $e) {
+                                Log::warning('Failed to calculate izin duration for points', [
+                                    'form_id' => $form->id,
+                                    'error' => $e->getMessage(),
+                                ]);
                             }
-                        } catch (\Throwable $e) {
-                            Log::warning('Failed to calculate izin duration for points', [
-                                'form_id' => $form->id,
-                                'error' => $e->getMessage(),
-                            ]);
                         }
                     }
 
@@ -109,33 +112,33 @@ class ApprovalService
                     // --- New discipline_score gamification logic ---
                     $disciplinePenalty = 0;
 
-                    // 1. Base penalty by izin type
-                    $isSakit = $type === 'sakit';
-                    $isDinasLuar = in_array($type, ['dinas luar', 'dinas_luar'], true);
-                    if (! $isSakit && ! $isDinasLuar) {
-                        // contoh: pribadi / kepentingan pribadi, dll.
-                        $disciplinePenalty += $basePenaltyNonSick;
-                    }
+                    if (! $isDinasLuar) {
+                        // 1. Base penalty by izin type
+                        if (! $isSakit) {
+                            // contoh: pribadi / kepentingan pribadi, dll.
+                            $disciplinePenalty += $basePenaltyNonSick;
+                        }
 
-                    // 2. Dynamic time-based penalty
-                    if (!empty($form->in_time) && !empty($form->out_time)) {
-                        try {
-                            $in = Carbon::createFromFormat('H:i', $form->in_time);
-                            $out = Carbon::createFromFormat('H:i', $form->out_time);
-                            $minutes = $out->diffInMinutes($in);
+                        // 2. Dynamic time-based penalty
+                        if (!empty($form->in_time) && !empty($form->out_time)) {
+                            try {
+                                $in = Carbon::createFromFormat('H:i', $form->in_time);
+                                $out = Carbon::createFromFormat('H:i', $form->out_time);
+                                $minutes = $out->diffInMinutes($in);
 
-                            if ($minutes > $toleranceMinutes) {
-                                $excess = $minutes - $toleranceMinutes;
-                                $blocks = (int) ceil($excess / $intervalMinutes);
-                                if ($blocks > 0) {
-                                    $disciplinePenalty += $blocks * $penaltyPerInterval;
+                                if ($minutes > $toleranceMinutes) {
+                                    $excess = $minutes - $toleranceMinutes;
+                                    $blocks = (int) ceil($excess / $intervalMinutes);
+                                    if ($blocks > 0) {
+                                        $disciplinePenalty += $blocks * $penaltyPerInterval;
+                                    }
                                 }
+                            } catch (\Throwable $e) {
+                                Log::warning('Failed to calculate duration for discipline_score', [
+                                    'form_id' => $form->id,
+                                    'error' => $e->getMessage(),
+                                ]);
                             }
-                        } catch (\Throwable $e) {
-                            Log::warning('Failed to calculate duration for discipline_score', [
-                                'form_id' => $form->id,
-                                'error' => $e->getMessage(),
-                            ]);
                         }
                     }
 

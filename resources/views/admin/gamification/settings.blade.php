@@ -7,8 +7,8 @@
 
     <div class="py-8 pb-24">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100 text-sm">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 text-sm">
                     @if (session('status'))
                         <div class="mb-4 px-4 py-2 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
                             {{ session('status') }}
@@ -24,7 +24,7 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium mb-1">Penalti dasar izin non-sakit</label>
+                                <label class="block text-sm font-medium mb-1">Penalti dasar izin pribadi</label>
                                 <input type="number" name="base_penalty_non_sick" min="0" max="100"
                                        class="border rounded p-2 w-full"
                                        value="{{ old('base_penalty_non_sick', $config['base_penalty_non_sick']) }}">
@@ -88,4 +88,3 @@
         </div>
     </div>
 </x-app-layout>
-

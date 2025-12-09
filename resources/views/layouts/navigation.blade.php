@@ -3,6 +3,24 @@
         $navUser = Auth::user();
         $navRole = $navUser->role ?? null;
         $isAdminLike = $navUser && (in_array($navRole, ['admin', 'hr'], true) || (bool) ($navUser->is_kepala_kepegawaian ?? false));
+        $navPointsValue = max(0, (int) ($navUser?->points ?? 0));
+        $navTierPoints = $navPointsValue;
+        // Jika poin disimpan 0-100, skala ke 0-500 agar sesuai tabel tier
+        if ($navPointsValue <= 150) {
+            $navTierPoints = $navPointsValue * 5;
+        }
+        $navBadge = [
+            'name' => 'Bronze',
+            'emoji' => '🥉',
+            'desc' => 'Kurang Disiplin (Dalam Pengawasan)',
+        ];
+        if ($navTierPoints > 500) {
+            $navBadge = ['name' => 'Platinum', 'emoji' => '💎', 'desc' => 'Sangat Disiplin (Role Model)'];
+        } elseif ($navTierPoints >= 300) {
+            $navBadge = ['name' => 'Gold', 'emoji' => '🥇', 'desc' => 'Disiplin (Sesuai SOP)'];
+        } elseif ($navTierPoints >= 100) {
+            $navBadge = ['name' => 'Silver', 'emoji' => '🥈', 'desc' => 'Cukup (Perlu Peningkatan)'];
+        }
     @endphp
     <!-- Primary Navigation Menu -->
     <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-10">
@@ -69,19 +87,30 @@
                                             <span class="ml-1">{{ $navUser->whatsapp_phone }}</span>
                                         </p>
                                     @endif
-                                    @php($navPoints = (int) ($navUser?->points ?? 100))
-                                    <p class="mt-1 inline-flex items-center text-[11px] text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full px-2 py-[1px]">
-                                        <span class="font-semibold">Poin:</span>
-                                        <span class="ml-1">{{ max(0, $navPoints) }}/100</span>
-                                    </p>
+                                    <div class="mt-1 space-y-1">
+                                        <p class="inline-flex items-center text-[11px] text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full px-2 py-[1px]">
+                                            <span class="font-semibold">Poin:</span>
+                                            <span class="ml-1">{{ $navPointsValue }}</span>
+                                        </p>
+                                        <p class="inline-flex items-center text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-[1px]">
+                                            <span class="font-semibold">{{ $navBadge['emoji'] }} {{ $navBadge['name'] }}</span>
+                                            <span class="ml-1 text-[10px] text-emerald-700">{{ $navBadge['desc'] }}</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="py-1 bg-white rounded-b-md">
-                            <x-dropdown-link :href="route('profile.edit', [], false)">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
+                            @if($isAdminLike)
+                                <x-dropdown-link :href="route('admin.users.edit', ['user' => $navUser], false)">
+                                    {{ __('Profile') }}
+                                </x-dropdown-link>
+                            @else
+                                <x-dropdown-link :href="route('profile.edit', [], false)">
+                                    {{ __('Profile') }}
+                                </x-dropdown-link>
+                            @endif
                             <x-dropdown-link :href="route('points.index', [], false)">
                                 {{ __('Poin Pelanggaran') }}
                             </x-dropdown-link>
@@ -166,18 +195,29 @@
                 <div>
                     <div class="font-medium text-base text-white">{{ $navUser?->name }}</div>
                     <div class="font-medium text-sm text-emerald-100">{{ $navUser?->email }}</div>
-                    @php($navPointsMobile = (int) ($navUser?->points ?? 100))
-                    <div class="mt-1 inline-flex items-center text-[11px] text-emerald-100 border border-emerald-200/70 rounded-full px-2 py-[1px] bg-emerald-800/40">
-                        <span class="font-semibold">Poin:</span>
-                        <span class="ml-1">{{ max(0, $navPointsMobile) }}/100</span>
+                    <div class="mt-2 space-y-1">
+                        <div class="inline-flex items-center text-[11px] text-emerald-100 border border-emerald-200/70 rounded-full px-2 py-[1px] bg-emerald-800/40">
+                            <span class="font-semibold">Poin:</span>
+                            <span class="ml-1">{{ $navPointsValue }}</span>
+                        </div>
+                        <div class="inline-flex items-center text-[11px] text-emerald-100 border border-emerald-200/70 rounded-full px-2 py-[1px] bg-emerald-800/40">
+                            <span class="font-semibold">{{ $navBadge['emoji'] }} {{ $navBadge['name'] }}</span>
+                            <span class="ml-1 text-[10px] text-emerald-50">{{ $navBadge['desc'] }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit', [], false)">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
+                @if($isAdminLike)
+                    <x-responsive-nav-link :href="route('admin.users.edit', ['user' => $navUser], false)">
+                        {{ __('Profile') }}
+                    </x-responsive-nav-link>
+                @else
+                    <x-responsive-nav-link :href="route('profile.edit', [], false)">
+                        {{ __('Profile') }}
+                    </x-responsive-nav-link>
+                @endif
                 <x-responsive-nav-link :href="route('points.index', [], false)">
                     {{ __('Poin Pelanggaran') }}
                 </x-responsive-nav-link>

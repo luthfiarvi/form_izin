@@ -7,8 +7,8 @@
 
     <div class="py-8 pb-24">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100 text-sm">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 text-sm">
                     <form method="get" class="mb-4 flex flex-wrap gap-3 items-end text-sm">
                         <div>
                             <label class="block text-sm mb-1">Tahun</label>

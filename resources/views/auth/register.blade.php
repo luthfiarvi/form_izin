@@ -1,6 +1,7 @@
 <x-guest-layout>
     <div class="text-center mb-4">
         <img src="{{ asset('img/logo.png') }}" alt="Logo" class="mx-auto h-16 w-16" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22 viewBox=%220 0 24 24%22%3E%3Crect width=%2224%22 height=%2224%22 rx=%224%22 fill=%22%2310b981%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 font-size=%2210%22 fill=%22white%22%3ELOGO%3C/text%3E%3C/svg%3E';"> 
+        <div class="mt-3 text-lg sm:text-xl font-bold text-emerald-700 tracking-wider uppercase">IHBS Izin</div>
         <h1 class="mt-3 text-2xl font-semibold text-brand-dark">Registrasi Akun</h1>
         <p class="text-sm text-gray-500">Buat akun untuk akses sistem</p>
     </div>
