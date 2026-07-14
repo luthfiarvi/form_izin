@@ -102,22 +102,3 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('/policy-log', [AdminPolicyLogController::class, 'index'])->name('policy-log.index');
 });
 
-// Route sementara untuk menjalankan migration & seeder di production
-Route::get('/run-setup', function () {
-    try {
-        // Jalankan migrasi jika ada tabel baru
-        \Illuminate\Support\Facades\Artisan::call('migrate', [
-            '--force' => true
-        ]);
-        
-        // Jalankan seeder admin
-        \Illuminate\Support\Facades\Artisan::call('db:seed', [
-            '--class' => 'AssignAdminSeeder',
-            '--force' => true
-        ]);
-        
-        return 'Migrasi dan Seeder berhasil dijalankan!';
-    } catch (\Exception $e) {
-        return 'Error: ' . $e->getMessage();
-    }
-});
