@@ -1,5 +1,8 @@
 <?php
 
+// Suppress deprecation warnings for PHP 8.5 compatibility
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
