@@ -21,8 +21,9 @@ class SecureHeaders
         $csp = "default-src 'self'; ".
                "base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; ".
                "img-src 'self' data: blob:; ".
-               "style-src 'self' 'unsafe-inline' $viteHttp https://fonts.bunny.net; ".
+               "style-src 'self' 'unsafe-inline' $viteHttp https://fonts.bunny.net https://fonts.googleapis.com; ".
                "script-src 'self' 'unsafe-inline' 'unsafe-eval' $viteHttp; ".
+               "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net; ".
                "connect-src 'self' $viteHttp $viteWs; upgrade-insecure-requests";
 
         $headers = [
