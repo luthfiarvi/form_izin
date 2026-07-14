@@ -12,11 +12,7 @@
                     <form method="get" class="mb-4 flex flex-wrap gap-3 items-end text-sm">
                         <div>
                             <label class="block text-sm mb-1">Tahun</label>
-                            <select name="year" class="border rounded p-2">
-                                @foreach($availableYears as $y)
-                                    <option value="{{ $y }}" @selected($year == $y)>{{ $y }}</option>
-                                @endforeach
-                            </select>
+                            <input type="number" name="year" class="border rounded p-2 w-28" value="{{ $year }}" placeholder="contoh: 2026">
                         </div>
                         <div>
                             <label class="block text-sm mb-1">Bulan (opsional)</label>
@@ -36,8 +32,12 @@
                             <label class="block text-sm mb-1">Cari nama/email</label>
                             <input type="text" name="q" value="{{ $search }}" class="border rounded p-2 w-full" placeholder="Nama atau email">
                         </div>
-                        <div>
+                        <div class="flex gap-2">
                             <x-primary-button>Filter</x-primary-button>
+                            <a href="{{ route('admin.gamification.summary.export', request()->all()) }}"
+                               class="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-md text-sm font-semibold">
+                                Export Excel
+                            </a>
                         </div>
                     </form>
 

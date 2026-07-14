@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\IzinController as AdminIzinController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\FileServeController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -16,6 +18,14 @@ Route::get('/', function () {
     }
     return redirect()->route('login');
 });
+
+// Graceful GET logout to avoid 419 when a user hits /logout directly (e.g., from an external link)
+Route::get('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout.get');
 
 // After login, send users to our main feature page instead of the default dashboard
 Route::get('/dashboard', function () {
@@ -86,6 +96,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('/gamification/settings', [AdminGamificationController::class, 'edit'])->name('gamification.settings');
     Route::post('/gamification/settings', [AdminGamificationController::class, 'update'])->name('gamification.settings.update');
     Route::get('/gamification/summary', [AdminGamificationController::class, 'summary'])->name('gamification.summary');
+    Route::get('/gamification/summary/export', [AdminGamificationController::class, 'exportSummary'])->name('gamification.summary.export');
 
     // Policy log viewer
     Route::get('/policy-log', [AdminPolicyLogController::class, 'index'])->name('policy-log.index');

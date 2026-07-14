@@ -58,12 +58,19 @@ class FormIzinController extends Controller
             'attachment_path' => $attachmentPath,
         ]);
 
-        // Notify admins / kepala kepegawaian
+        // Notify HR & kepala kepegawaian saja (hindari admin umum), dedup by email
         $recipients = \App\Models\User::query()
-            ->whereIn('role', ['admin', 'hr'])
+            ->where('role', 'hr')
             ->orWhere('is_kepala_kepegawaian', true)
-            ->get();
-        Notification::send($recipients, new IzinSubmitted($form));
+            ->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (!empty($recipients)) {
+            Notification::route('mail', $recipients)->notify(new IzinSubmitted($form));
+        }
 
         return redirect()->route('dashboard')->with('status', 'Form Izin submitted');
     }

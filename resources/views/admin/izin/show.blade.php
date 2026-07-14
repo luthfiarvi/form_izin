@@ -7,8 +7,8 @@
 
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-4 text-gray-900 dark:text-gray-100 space-y-0">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
+                <div class="p-4 text-gray-900 space-y-0">
                     <div class="flex items-start justify-between gap-6">
                         <div class="flex-1 space-y-1">
                             <div class="font-semibold text-base">Pemohon</div>

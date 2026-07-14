@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-brand-dark text-white shadow-md">
+<nav x-data="{ open: false }" class="text-white shadow-md" style="background:linear-gradient(135deg,#0f2d3d 0%,#1a4a5e 100%);box-shadow:0 2px 20px rgba(0,0,0,0.28);">
     @php
         $navUser = Auth::user();
         $navRole = $navUser->role ?? null;
@@ -171,7 +171,7 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-brand-dark text-white">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden text-white" style="background:linear-gradient(135deg,#0f2d3d 0%,#1a4a5e 100%);">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard', [], false)" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}

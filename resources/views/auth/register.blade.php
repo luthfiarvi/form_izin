@@ -1,148 +1,167 @@
 <x-guest-layout>
-    <div class="text-center mb-4">
-        <img src="{{ asset('img/logo.png') }}" alt="Logo" class="mx-auto h-16 w-16" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22 viewBox=%220 0 24 24%22%3E%3Crect width=%2224%22 height=%2224%22 rx=%224%22 fill=%22%2310b981%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 font-size=%2210%22 fill=%22white%22%3ELOGO%3C/text%3E%3C/svg%3E';"> 
-        <div class="mt-3 text-lg sm:text-xl font-bold text-emerald-700 tracking-wider uppercase">IHBS Izin</div>
-        <h1 class="mt-3 text-2xl font-semibold text-brand-dark">Registrasi Akun</h1>
-        <p class="text-sm text-gray-500">Buat akun untuk akses sistem</p>
+    {{-- Header --}}
+    <div class="text-center mb-7">
+        <div class="auth-logo-ring">
+            <img src="{{ asset('img/logo.png') }}" alt="Logo" class="h-10 w-10 object-contain rounded-full"
+                 onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+        </div>
+        <div class="mt-3 text-xs font-bold tracking-widest uppercase" style="color:#059669;letter-spacing:0.12em;">IHBS Izin</div>
+        <h1 class="mt-2 text-2xl font-bold" style="color:#0f2d3d;letter-spacing:-0.02em;">Buat Akun Baru</h1>
+        <p class="mt-1 text-sm" style="color:#64748b;">Lengkapi formulir di bawah untuk mendaftar</p>
     </div>
 
-    <form method="POST" action="{{ route('register', [], false) }}" enctype="multipart/form-data" x-data="{ show: false }">
+    <form method="POST" action="{{ route('register', [], false) }}" enctype="multipart/form-data" x-data="{ show: false }" class="space-y-4">
         @csrf
 
-        <!-- Username -->
-        <label for="name" class="sr-only">Username</label>
-        <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name"
-               placeholder="Username"
-               class="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-emerald-600 focus:ring focus:ring-emerald-200" />
-        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        {{-- Name --}}
+        <div>
+            <label for="name" class="form-label">Nama Lengkap</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </span>
+                <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name"
+                       placeholder="Nama lengkap Anda" class="form-input" style="padding-left:38px;" />
+            </div>
+            <x-input-error :messages="$errors->get('name')" class="mt-1.5" />
+        </div>
 
-        <!-- Email (opsional) -->
-        <label for="email" class="sr-only">Email</label>
-        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="username"
-               placeholder="Email"
-               class="mt-4 w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-emerald-600 focus:ring focus:ring-emerald-200" />
-        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        {{-- Email --}}
+        <div>
+            <label for="email" class="form-label">Alamat Email</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
+                </span>
+                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="username"
+                       placeholder="nama@contoh.com" class="form-input" style="padding-left:38px;" />
+            </div>
+            <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
+        </div>
 
-        <!-- WhatsApp (opsional) -->
-        <label for="whatsapp" class="sr-only">WhatsApp</label>
-        <input id="whatsapp" name="whatsapp" type="tel" value="{{ old('whatsapp') }}"
-               placeholder="No. WhatsApp (opsional, contoh 62812xxxx)"
-               class="mt-4 w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-emerald-600 focus:ring focus:ring-emerald-200" />
+        {{-- WhatsApp --}}
+        <div>
+            <label for="whatsapp" class="form-label">No. WhatsApp <span style="color:#94a3b8;font-weight:400;">(opsional)</span></label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                </span>
+                <input id="whatsapp" name="whatsapp" type="tel" value="{{ old('whatsapp') }}"
+                       placeholder="Contoh: 628123456789" class="form-input" style="padding-left:38px;" />
+            </div>
+        </div>
 
-        <!-- Foto Profil (opsional) -->
-        <div class="mt-4">
-            <label for="profile_photo" class="block text-sm font-medium text-gray-700 mb-1">Foto Profil (opsional)</label>
+        {{-- Foto Profil --}}
+        <div>
+            <label for="profile_photo" class="form-label">Foto Profil <span style="color:#94a3b8;font-weight:400;">(opsional)</span></label>
             <input id="profile_photo" name="profile_photo" type="file" accept="image/*"
-                   class="w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[color:var(--brand-green)] file:text-white hover:file:bg-emerald-900" />
-            <p class="mt-1 text-xs text-gray-500">Format: gambar apa pun (JPG/PNG/HEIC, dll), maksimum 4MB.</p>
-            <x-input-error :messages="$errors->get('profile_photo')" class="mt-2" />
+                   class="form-input"
+                   style="padding:8px;cursor:pointer;" />
+            <p style="font-size:0.72rem;color:#94a3b8;margin-top:4px;">JPG/PNG/HEIC, maksimum 4MB</p>
+            <x-input-error :messages="$errors->get('profile_photo')" class="mt-1.5" />
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <label for="password" class="sr-only">Password</label>
-            <div class="flex items-stretch rounded-md border border-gray-300 bg-white focus-within:border-emerald-600">
-                <input type="password" x-bind:type="show ? 'text' : 'password'" id="password" name="password" required autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"
-                       placeholder="Password (min 6 karakter)"
-                       class="flex-1 rounded-md rounded-e-none border-0 bg-transparent px-3 py-2 focus:outline-none focus:ring-0" />
-                <button type="button" id="toggle-register-password-btn"
-                        @click="show = !show" @pointerdown="show = true" @pointerup="show = false" @pointerleave="show = false"
-                        class="px-3 border-l border-gray-200 text-gray-500 hover:text-gray-700 focus:outline-none"
-                        aria-label="Lihat password" title="Tahan untuk mengintip / klik untuk toggle">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+        {{-- Password --}}
+        <div>
+            <label for="password" class="form-label">Password</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </span>
+                <input type="password" x-bind:type="show ? 'text' : 'password'"
+                       id="password" name="password" required autocomplete="new-password"
+                       placeholder="Minimal 6 karakter" class="form-input" style="padding-left:38px;padding-right:42px;" />
+                <button type="button" @click="show = !show"
+                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:0;display:flex;align-items:center;" aria-label="Lihat password">
+                    <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <svg x-show="show" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
                 </button>
             </div>
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
         </div>
 
-        <!-- Confirm Password -->
-        <label for="password_confirmation" class="sr-only">Konfirmasi Password</label>
-        <div class="mt-4">
-            <div class="flex items-stretch rounded-md border border-gray-300 bg-white focus-within:border-emerald-600">
-                <input id="password_confirmation" name="password_confirmation" type="password" x-bind:type="show ? 'text' : 'password'" required autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"
-                       placeholder="Ulangi password"
-                       class="flex-1 rounded-md rounded-e-none border-0 bg-transparent px-3 py-2 focus:outline-none focus:ring-0" />
-                <button type="button" id="toggle-register-confirm-btn"
-                        @click="show = !show" @pointerdown="show = true" @pointerup="show = false" @pointerleave="show = false"
-                        class="px-3 border-l border-gray-200 text-gray-500 hover:text-gray-700 focus:outline-none"
-                        aria-label="Lihat password" title="Tahan untuk mengintip / klik untuk toggle">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </button>
+        {{-- Confirm Password --}}
+        <div>
+            <label for="password_confirmation" class="form-label">Ulangi Password</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </span>
+                <input id="password_confirmation" name="password_confirmation" type="password"
+                       x-bind:type="show ? 'text' : 'password'" required autocomplete="new-password"
+                       placeholder="Ulangi password" class="form-input" style="padding-left:38px;" />
             </div>
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1.5" />
         </div>
-        @push('scripts')
-        <script>
-        (function(){
-          var p = document.getElementById('password');
-          var pc = document.getElementById('password_confirmation');
-          var bp = document.getElementById('toggle-register-password-btn');
-          var bc = document.getElementById('toggle-register-confirm-btn');
-          function set(el,type){ if(el){ try{ el.setAttribute('type', type);}catch(e){} } }
-          if (bp && p){
-            bp.addEventListener('click', function(){ set(p, p.type==='password'?'text':'password'); });
-            bp.addEventListener('pointerdown', function(){ set(p,'text'); });
-            bp.addEventListener('pointerup', function(){ set(p,'password'); });
-            bp.addEventListener('pointerleave', function(){ set(p,'password'); });
-          }
-          if (bc && pc){
-            bc.addEventListener('click', function(){ set(pc, pc.type==='password'?'text':'password'); });
-            bc.addEventListener('pointerdown', function(){ set(pc,'text'); });
-            bc.addEventListener('pointerup', function(){ set(pc,'password'); });
-            bc.addEventListener('pointerleave', function(){ set(pc,'password'); });
-          }
-        })();
-        </script>
-        @endpush
-        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
 
-        <!-- Signature (opsional) -->
-        <div class="mt-6">
-            <p class="mb-2 text-sm text-gray-700">Tanda Tangan (opsional)</p>
-            <div class="border rounded-md p-3">
-                <canvas id="signature-canvas" width="500" height="160" class="w-full border rounded bg-white touch-none"></canvas>
-                <div class="mt-2 flex items-center gap-2">
-                    <button type="button" id="clear-signature" class="px-3 py-1 text-sm rounded bg-amber-500 text-white hover:bg-amber-600">Bersihkan</button>
-                    <label for="signature_file_register" class="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">Unggah</label>
-                    <span class="text-xs text-gray-600" data-signature-file-name></span>
+        {{-- Tanda Tangan --}}
+        <div>
+            <label class="form-label">Tanda Tangan <span style="color:#94a3b8;font-weight:400;">(opsional)</span></label>
+            <div style="border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fafafa;">
+                <canvas id="signature-canvas" width="500" height="140"
+                        style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:white;touch-action:none;display:block;"></canvas>
+                <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <button type="button" id="clear-signature"
+                            style="padding:6px 14px;border-radius:8px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:0.8125rem;font-weight:600;cursor:pointer;">
+                        🗑 Bersihkan
+                    </button>
+                    <label for="signature_file_register"
+                           style="padding:6px 14px;border-radius:8px;background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;font-size:0.8125rem;font-weight:600;cursor:pointer;">
+                        📁 Unggah Gambar
+                    </label>
+                    <span style="font-size:0.75rem;color:#64748b;" data-signature-file-name></span>
                 </div>
                 <input id="signature_file_register" type="file" name="signature_file" accept="image/*" class="hidden" />
                 <input type="hidden" name="signature" id="signature" value="">
-                <x-input-error :messages="$errors->get('signature_file')" class="mt-2" />
-                <x-input-error :messages="$errors->get('signature')" class="mt-1" />
+                <x-input-error :messages="$errors->get('signature_file')" class="mt-1.5" />
             </div>
         </div>
 
-        @push('scripts')
-        <script>
-        (function(){
-          const canvas=document.getElementById('signature-canvas');
-          if(!canvas || canvas.dataset.sigInitialized==='1' || !canvas.getContext) return;
-          const ctx=canvas.getContext('2d'); let draw=false;
-          function pos(e){ const r=canvas.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return {x:t.clientX-r.left,y:t.clientY-r.top}; }
-          function start(e){ draw=true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); e.preventDefault(); }
-          function move(e){ if(!draw) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); }
-          function end(){ draw=false; }
-          canvas.style.touchAction='none';
-          canvas.addEventListener('pointerdown',start); canvas.addEventListener('pointermove',move); window.addEventListener('pointerup',end);
-          canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false}); window.addEventListener('touchend',end);
-          const clearBtn=document.getElementById('clear-signature'); if(clearBtn){ clearBtn.addEventListener('click',()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); }); }
-          const form=canvas.closest('form'); const hidden=document.getElementById('signature'); if(form&&hidden){ form.addEventListener('submit',()=>{ try{ hidden.value=canvas.toDataURL('image/png'); }catch(_){} }); }
-          const fi=document.getElementById('signature_file_register'); const nameEl=document.querySelector('[data-signature-file-name]'); if(fi&&nameEl){ fi.addEventListener('change',()=>{ nameEl.textContent=fi.files&&fi.files[0]?fi.files[0].name:''; }); }
-          canvas.dataset.sigInitialized='1';
-        })();
-        </script>
-        @endpush
+        {{-- Submit --}}
+        <button type="submit" class="btn btn-primary w-full" style="width:100%;padding:12px;font-size:0.9375rem;margin-top:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+            Daftar Sekarang
+        </button>
 
-        <button type="submit" class="mt-6 w-full rounded-md bg-[color:var(--brand-green)] text-white py-2 font-medium hover:bg-emerald-900">Daftar</button>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:2px;">
+            <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+            <span style="font-size:0.75rem;color:#94a3b8;white-space:nowrap;">Sudah punya akun?</span>
+            <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+        </div>
 
-        <p class="mt-3 text-center text-sm text-emerald-700">
-            Sudah punya akun? <a href="{{ route('login', [], false) }}" class="hover:underline">Login</a>
-        </p>
+        <a href="{{ route('login', [], false) }}"
+           class="btn btn-ghost w-full" style="width:100%;padding:11px;font-size:0.875rem;color:#059669;border-color:#d1fae5;background:#f0fdf4;margin-top:-2px;">
+            Masuk ke Akun
+        </a>
     </form>
+
+    @push('scripts')
+    <script>
+    (function(){
+      const canvas = document.getElementById('signature-canvas');
+      if (!canvas || canvas.dataset.sigInitialized === '1' || !canvas.getContext) return;
+      const ctx = canvas.getContext('2d');
+      let draw = false;
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      function pos(e){ const r=canvas.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return {x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)}; }
+      function start(e){ draw=true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); e.preventDefault(); }
+      function move(e){ if(!draw) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); }
+      function end(){ draw=false; }
+      canvas.addEventListener('pointerdown',start); canvas.addEventListener('pointermove',move); window.addEventListener('pointerup',end);
+      canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false}); window.addEventListener('touchend',end);
+      document.getElementById('clear-signature')?.addEventListener('click',()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); });
+      const form=canvas.closest('form'); const hidden=document.getElementById('signature');
+      if(form&&hidden){ form.addEventListener('submit',()=>{ try{hidden.value=canvas.toDataURL('image/png');}catch(_){} }); }
+      const fi=document.getElementById('signature_file_register'); const nameEl=document.querySelector('[data-signature-file-name]');
+      if(fi&&nameEl){ fi.addEventListener('change',()=>{ nameEl.textContent=fi.files&&fi.files[0]?fi.files[0].name:''; }); }
+      canvas.dataset.sigInitialized='1';
+    })();
+    </script>
+    @endpush
 </x-guest-layout>

@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Contracts\View\View;
 
 class FileServeController extends Controller
 {
     // Route-level middleware 'auth' is applied in routes/web.php
 
-    public function serveAttachment(Request $request, string $filename): StreamedResponse
+    public function serveAttachment(Request $request, string $filename)
     {
         $filename = basename($filename);
         $path = 'attachments/'.$filename;
@@ -44,7 +45,23 @@ class FileServeController extends Controller
             abort(404);
         }
 
-        return Storage::disk('public')->download($path);
+        // Tampilkan inline (gambar/PDF) agar tidak ter-download otomatis
+        $name = basename($path);
+        // raw=1 => langsung file inline (untuk iframe/embed dan unduh)
+        if ($request->boolean('raw')) {
+            $disposition = $request->boolean('download') ? 'attachment' : 'inline';
+            return Storage::disk('public')->response($path, $name, [
+                'Content-Disposition' => $disposition.'; filename="'.$name.'"',
+            ]);
+        }
+
+        // Default: tampilkan halaman viewer dengan tombol kembali/unduh
+        $rawUrl = route('files.attachment', ['filename' => $filename, 'raw' => 1], false);
+
+        return response()->view('files.attachment', [
+            'filename' => $filename,
+            'rawUrl' => $rawUrl,
+        ]);
     }
 
     public function serveSignature(Request $request, string $filename): StreamedResponse
