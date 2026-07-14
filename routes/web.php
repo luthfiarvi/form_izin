@@ -102,15 +102,4 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('/policy-log', [AdminPolicyLogController::class, 'index'])->name('policy-log.index');
 });
 
-// Route sementara untuk melihat kredensial database
-Route::get('/show-db-env', function () {
-    return [
-        'DB_CONNECTION' => env('DB_CONNECTION'),
-        'DB_HOST' => env('DB_HOST'),
-        'DB_PORT' => env('DB_PORT'),
-        'DB_DATABASE' => env('DB_DATABASE'),
-        'DB_USERNAME' => env('DB_USERNAME'),
-        'DB_PASSWORD' => env('DB_PASSWORD'),
-    ];
-});
 
